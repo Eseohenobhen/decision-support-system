@@ -27,3 +27,28 @@ class AllocationRecommendationResponse(BaseModel):
     recommended_total: Decimal
     selected_item_ids: list[int]
     deferred_item_ids: list[int]
+
+
+class AutomaticAllocationRequest(BaseModel):
+    property_id: int = Field(gt=0)
+    fiscal_year: int = Field(ge=2000, le=2100)
+
+
+class AutomaticAllocationItem(BaseModel):
+    allocation_id: int
+    maintenance_request_id: int
+    priority_score: int
+    requested_amount: Decimal
+    allocated_amount: Decimal
+    fully_funded: bool
+
+
+class AutomaticAllocationResponse(BaseModel):
+    property_id: int
+    fund_id: int
+    fiscal_year: int
+    starting_available_fund: Decimal
+    ending_available_fund: Decimal
+    total_allocated: Decimal
+    allocations_created: int
+    allocations: list[AutomaticAllocationItem]

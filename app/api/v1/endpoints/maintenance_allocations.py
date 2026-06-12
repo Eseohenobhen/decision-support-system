@@ -1,14 +1,20 @@
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_property_manager
+from app.api.deps import get_current_property_manager, get_db
 from app.models.user import User
+from app.schemas.dss import DSSRankingRequest, DSSRankingResponse
 from app.schemas.maintenance_allocation import (
     AllocationRecommendationRequest,
     AllocationRecommendationResponse,
+    AutomaticAllocationRequest,
+    AutomaticAllocationResponse,
     MaintenanceAllocationSummary,
 )
+from app.services.allocation_service import automatically_allocate_funds
+from app.services.dss_engine import rank_recommendations
 
 router = APIRouter()
 
@@ -48,4 +54,28 @@ def recommend_allocation(
         deferred_item_ids=[
             item.item_id for item in request.items if item.item_id not in selected_item_ids
         ],
+    )
+
+
+@router.post("/dss/rank", response_model=DSSRankingResponse)
+def rank_maintenance_recommendations(
+    request: DSSRankingRequest,
+    _: User = Depends(get_current_property_manager),
+) -> DSSRankingResponse:
+    return DSSRankingResponse(
+        formula="(U * 0.4) + (I * 0.3) + (A * 0.2) - (Cost Factor * 0.1)",
+        items=rank_recommendations(request.items),
+    )
+
+
+@router.post("/auto-allocate", response_model=AutomaticAllocationResponse)
+def auto_allocate_maintenance_funds(
+    request: AutomaticAllocationRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_property_manager),
+) -> AutomaticAllocationResponse:
+    return automatically_allocate_funds(
+        db,
+        allocation_in=request,
+        current_user=current_user,
     )
