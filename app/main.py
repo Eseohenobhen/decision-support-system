@@ -17,6 +17,14 @@ def create_app() -> FastAPI:
     def health_check() -> dict[str, str]:
         return {"status": "ok"}
 
+    @app.get("/", tags=["root"])
+    def root() -> dict[str, str]:
+        return {
+            "application": "Decision Support System for Property Fund Allocation and Maintenance Requests",
+            "status": "running",
+            "version": "1.0.0",
+        }
+
     return app
 
 
