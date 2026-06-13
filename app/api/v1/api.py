@@ -6,6 +6,7 @@ from app.api.v1.endpoints import (
     maintenance_allocations,
     maintenance_requests,
     properties,
+    reports,
     users,
 )
 
@@ -24,3 +25,4 @@ api_router.include_router(
     prefix="/maintenance-allocations",
     tags=["maintenance allocations"],
 )
+api_router.include_router(reports.router, prefix="/reports", tags=["reports"])

@@ -26,3 +26,26 @@ export const dssApi = {
   rank: (payload) => api.post("/maintenance-allocations/dss/rank", payload),
   autoAllocate: (payload) => api.post("/maintenance-allocations/auto-allocate", payload),
 };
+
+export const reportsApi = {
+  propertySummary: (format = "pdf") =>
+    api.get("/reports/property-summary", {
+      params: { format },
+      responseType: "blob",
+    }),
+  fundAllocation: (format = "pdf") =>
+    api.get("/reports/fund-allocation", {
+      params: { format },
+      responseType: "blob",
+    }),
+  maintenanceHistory: (format = "pdf") =>
+    api.get("/reports/maintenance-history", {
+      params: { format },
+      responseType: "blob",
+    }),
+  monthlyFinancial: (format = "pdf") =>
+    api.get("/reports/monthly-financial", {
+      params: { format },
+      responseType: "blob",
+    }),
+};
