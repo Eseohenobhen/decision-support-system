@@ -8,6 +8,7 @@ from app.models.property import Property
 from app.models.property_fund import PropertyFund
 from app.models.user import User, UserRole
 from app.schemas.fund import PropertyFundCreate, PropertyFundUpdate
+from app.services.manager_access import manager_property_access_filter
 from app.services.property_service import get_accessible_property, get_property
 
 
@@ -19,7 +20,7 @@ def list_funds(
 ) -> list[PropertyFund]:
     stmt = select(PropertyFund).order_by(PropertyFund.fiscal_year.desc()).offset(skip).limit(limit)
     if current_user.role == UserRole.PROPERTY_MANAGER:
-        stmt = stmt.join(Property).where(Property.manager_id == current_user.id)
+        stmt = stmt.join(Property).where(manager_property_access_filter(current_user.id))
     return list(db.scalars(stmt))
 
 

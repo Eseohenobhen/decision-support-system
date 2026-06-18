@@ -49,7 +49,7 @@ def admin_user(db_session):
     user = User(
         email="admin@example.com",
         full_name="Admin User",
-        hashed_password="$2b$12$test_admin_hash_60_char_long_xxxxxxxxxxxxxxxx",
+        hashed_password=password_context.hash("pass123"),
         role=UserRole.ADMIN,
         is_active=True,
     )
@@ -64,7 +64,7 @@ def manager_user(db_session):
     user = User(
         email="manager@example.com",
         full_name="Manager User",
-        hashed_password="$2b$12$test_mgr_hash_60_char_long_xxxxxxxxxxxxxxxx",
+        hashed_password=password_context.hash("pass123"),
         role=UserRole.PROPERTY_MANAGER,
         is_active=True,
     )

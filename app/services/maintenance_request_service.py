@@ -9,6 +9,7 @@ from app.schemas.maintenance_request_crud import (
     MaintenanceRequestCreate,
     MaintenanceRequestUpdate,
 )
+from app.services.manager_access import manager_property_access_filter
 from app.services.property_service import get_accessible_property
 
 
@@ -23,7 +24,7 @@ def list_maintenance_requests(
     stmt = select(MaintenanceRequest).order_by(MaintenanceRequest.requested_at.desc())
 
     if current_user.role == UserRole.PROPERTY_MANAGER:
-        stmt = stmt.join(Property).where(Property.manager_id == current_user.id)
+        stmt = stmt.join(Property).where(manager_property_access_filter(current_user.id))
 
     if property_id is not None:
         if current_user.role == UserRole.PROPERTY_MANAGER:

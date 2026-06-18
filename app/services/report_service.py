@@ -17,29 +17,30 @@ from app.models.property import Property
 from app.models.property_fund import PropertyFund
 from app.models.maintenance_request import MaintenanceRequest
 from app.models.user import User, UserRole
+from app.services.manager_access import manager_property_access_filter
 
 
 def _apply_property_manager_filter(stmt, current_user):
     if current_user.role == UserRole.PROPERTY_MANAGER:
-        stmt = stmt.where(Property.manager_id == current_user.id)
+        stmt = stmt.where(manager_property_access_filter(current_user.id))
     return stmt
 
 
 def _apply_property_fund_manager_filter(stmt, current_user):
     if current_user.role == UserRole.PROPERTY_MANAGER:
-        stmt = stmt.join(Property).where(Property.manager_id == current_user.id)
+        stmt = stmt.join(Property).where(manager_property_access_filter(current_user.id))
     return stmt
 
 
 def _apply_transaction_manager_filter(stmt, current_user):
     if current_user.role == UserRole.PROPERTY_MANAGER:
-        stmt = stmt.join(FundTransaction.fund).join(Property).where(Property.manager_id == current_user.id)
+        stmt = stmt.join(FundTransaction.fund).join(Property).where(manager_property_access_filter(current_user.id))
     return stmt
 
 
 def _apply_request_manager_filter(stmt, current_user):
     if current_user.role == UserRole.PROPERTY_MANAGER:
-        stmt = stmt.join(Property).where(Property.manager_id == current_user.id)
+        stmt = stmt.join(Property).where(manager_property_access_filter(current_user.id))
     return stmt
 
 
@@ -217,7 +218,9 @@ def _create_excel_report(title: str, headers: list[str], rows: list[dict[str, ob
 
 
 def build_report_file(report_name: str, rows: list[dict[str, object]], format: str) -> BytesIO:
-    headers = list(rows[0].keys()) if rows else []
+    if not rows:
+        rows = [{"Message": "No records found"}]
+    headers = list(rows[0].keys())
     if format == "pdf":
         return _create_pdf_report(report_name, headers, rows)
     return _create_excel_report(report_name, headers, rows)

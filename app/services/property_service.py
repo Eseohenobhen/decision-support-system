@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.models.property import Property
 from app.models.user import User, UserRole
 from app.schemas.property import PropertyCreate, PropertyUpdate
+from app.services.manager_access import is_manager_assigned_to_property, manager_property_access_filter
 from app.services.user_service import get_user_by_id
 
 
@@ -16,7 +17,7 @@ def list_properties(
 ) -> list[Property]:
     stmt = select(Property).order_by(Property.name).offset(skip).limit(limit)
     if current_user.role == UserRole.PROPERTY_MANAGER:
-        stmt = stmt.where(Property.manager_id == current_user.id)
+        stmt = stmt.where(manager_property_access_filter(current_user.id))
     return list(db.scalars(stmt))
 
 
@@ -33,7 +34,11 @@ def get_accessible_property(
     if property_ is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
 
-    if current_user.role == UserRole.PROPERTY_MANAGER and property_.manager_id != current_user.id:
+    if current_user.role == UserRole.PROPERTY_MANAGER and not is_manager_assigned_to_property(
+        db,
+        current_user.id,
+        property_.id,
+    ):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
 
     return property_

@@ -52,3 +52,8 @@ class Property(Base):
         back_populates="property",
         cascade="all, delete-orphan",
     )
+    manager_assignments: Mapped[list["ManagerProperty"]] = relationship(
+        "ManagerProperty",
+        back_populates="property",
+        cascade="all, delete-orphan",
+    )

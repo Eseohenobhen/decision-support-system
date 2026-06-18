@@ -42,6 +42,11 @@ class User(Base):
         back_populates="manager",
         foreign_keys="Property.manager_id",
     )
+    property_assignments: Mapped[list["ManagerProperty"]] = relationship(
+        "ManagerProperty",
+        back_populates="manager",
+        cascade="all, delete-orphan",
+    )
     fund_transactions: Mapped[list["FundTransaction"]] = relationship(
         "FundTransaction",
         back_populates="performed_by",

@@ -1,5 +1,6 @@
 from app.models.allocation import Allocation, AllocationStatus
 from app.models.fund_transaction import FundTransaction, FundTransactionType
+from app.models.manager_property import ManagerProperty
 from app.models.maintenance_request import (
     MaintenancePriority,
     MaintenanceRequest,
@@ -14,6 +15,7 @@ __all__ = [
     "AllocationStatus",
     "FundTransaction",
     "FundTransactionType",
+    "ManagerProperty",
     "MaintenancePriority",
     "MaintenanceRequest",
     "MaintenanceRequestStatus",
